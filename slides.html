@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Docker before production</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu);
+      body {
+        font-family: 'Ubuntu';
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      .chapter {
+        position: absolute;
+        top: 0;
+        left: 4em;
+        width: 83%;
+        border-bottom: 1px solid #FD4400;
+        color: #FD4400;
+        text-align: center;
+        vertical-align: middle;
+      }
+      .cut {
+        text-decoration: line-through;
+        color: grey;
+      }
+      h1, h2, h3, h4, em {
+        color: #FD4400;
+      }
+      h4 {
+        margin-bottom: 0.1em;
+      }
+      h4+ul {
+        margin-top: 0.3em;
+      }
+      .footnote {
+        position: absolute;
+        bottom: 0.5em;
+        color: grey;
+        left: 4em;
+        text-align: left;
+      }
+      p+ul {
+        margin-top: -0.8em;
+      }
+      em {
+        font-style: normal;
+        color: #FD4400;
+      }
+      .center {
+        text-align: center;
+      }
+      .middle {
+        padding-bottom: 7em;
+      }
+      .comment {
+        color: #FF4500;
+      }
+      code {
+        background-color: #FFF8F8 !important;
+        padding: 4px;
+      }
+      .remark-code, .remark-inline-code { 
+        font-family: 'Ubuntu Mono'; 
+      }
+      table.row {
+        border-collapse: collapse !important;
+      }
+      table.row td {
+        border: 1px solid #FF4500;
+      }
+      table.diagram {
+        border: 1px solid #FF4500;
+        border-spacing: 0;
+      }
+        table.diagram td{
+        padding: 0 15px 0 15px;
+        height: 1.3em;
+      }
+        table.diagram th {
+        color: #FF4500;
+        font-weight: normal;
+      }
+      table.diagram td.em {
+        background-color: #FFE8E8;
+      }
+      table.diagram {
+        font-family: "Ubuntu Mono";
+        display: inline-block;
+      } 
+      .red {
+        color: red;
+      }
+
+      p+ul {
+      /* reduce spacing for lists folowing a paragraph */
+      margin-top: -0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+We can't use Docker in production!
+
+---
+Common misconceptions:
+* Docker is all-or-nothing 
+* Docker complicates things
+* Docker doesn't work on Windows
+* Docker is only useful in Production
+
+???
+
+Not saying that Docker is not complicated, it's just simpler and more sane than the alternatives
+
+Docker works on windows just as good as Git. It has its quirks and I'd rather be using Linux, but the issues that exist are minor.
+
+---
+Regular CD pipeline:
+
+Dev ➜ CI ➜ QA ➜ Demo ➜ <span color=red>Prod</span>
+
+---
+
+Before production:
+- running the system (dev machine, qa envs, etc.)
+- building the code & unit tests (dev machine, CI server)
+- deploying/configuring a full system (dev, qa, demo)
+- integration testing (dev, qa)
+- end-to-end testing (dev, qa)
+- performance testing (dev, qa, demo)
+
+???
+
+So first thing to notice is that everything needs to be done by the developers on their own environment! People are usually (negatively) suprprised by this, but only because it's been hard to do in the past. Remember branches before git, in svn?
+
+---
+.chapter[Running]
+What we have right now? 
+
+Does our service require any dependencies? Db? Cache? Auth Server? Service registry?
+
+The infamous "how to setup your environment" wiki page
+* often poorly written
+* often outdated
+* always incomplete
+
+Vagrant does solve many of these issues.
+
+---
+.chapter[Running]
+
+Run your dependencies with Docker!
+* composable: you can reuse containers between services
+* very fast start times compared to a VM
+* never gets outdated
+
+`docker-compose up` and done
+
+???
+
+composable: very useful if working on multiple services
+
+not wasting ram by having multiple vms
+
+---
+.chapter[Building]
+
+What's wrong with how we do things?
+
+CI server has everything and the kitchen sink:
+- JDK 7
+- JDK 8
+- 3 versions of Node
+- Python (3 or 2?)
+
+Each update means Ops headaches.
+
+Each update can mean a whole different build breaks.
+
+
+.footnote[Cleanup? What's that?]
+
+???
+
+everything but the kitchen sink =  to cover the 20+ projects on the CI server
+
+no isolation = impossible to test if an update will break things
+
+---
+.chapter[Building]
+
+Do the build inside a Docker container!
+- Devs maintain Docker image for doing the build
+- Builds completely isolated
+- Upgrades to newer Java, Node, .NET Core are completely transparent
+- You don't even need to save the artifacts, they get pushed to Nexus/Docker Registry/etc.
+
+???
+
+having something describe what's needed for the build (i.e the build dockerfile) also acts as documentation that's guaranteed to work and not get outdated.
+
+---
+.chapter[Building]
+Gotchas: 
+- make sure you use volumes for package caches (.node_modules, .m2, .etc)
+- ???
+
+???
+
+share package cache = no need to download the internet again with each build
+
+---
+.chapter[Deployment]
+What's wrong with how we do things?
+
+- dev machine: manual ad-hoc configuration, vagrant (Devs)
+- qa envs: ad-hoc scripts, config management tool (e.g Puppet) (Ops)
+ - usually different from Prod anyway
+ - manually configured on each machine/env
+
+???
+
+prod: Different scripts because prod is different, right? Well it doesn't have to be! Well it may probably still be different, but not by as much as it is now.
+
+---
+class: center, middle
+
+.chapter[Deployment]
+
+
+changes are done by hand, often late,
+<br>
+by people other than the implementors
+
+↓
+
+mistakes are made, timelines are broken
+
+↓
+
+people stop wanting to change stuff
+
+
+---
+.chapter[Deployment]
+
+Deploy with Docker!
+* Package your apps as images ➜ ensure they work the same everywhere
+* Isolation in docker is free ➜ number of servers doesn't matter 
+* Dev maintains the docker-compose.yml file ➜ required Ops interventions is minimized
+
+
+Dependencies
+* also run as containers just like in Dev (e.g as part of the same docker-compose project)
+
+Tips:
+* Package even web apps static files, e.g extending the nginx image
+* The same images can be used by Devs
+* The **whole** system must run with Docker!
+
+
+---
+.chapter[Automatic Testing]
+
+- integration testing: requires other services to be up
+- end-to-end testing: requires selenium hub/slave
+- performance testing requires
+ - (maybe) dedicated instance of the service 
+ - (maybe) several workers that will hit the service
+
+---
+.chapter[Automatic Testing]
+
+Run all of the above as containers!<sup>*</sup>
+- short-lived containers that are only live during the build
+
+Gotchas:
+- make sure the containers actually stop after the build!
+ - Jenkinsfile try finally, bash exit traps, etc.
+ - periodic sanity cleanup scripts
+- use namespaces (e.g compose project names) to prevent conflicts
+- make sure you have enough resources
+
+
+.footnote[<sup>*</sup> no surprise by now]
+---
+
+Doing all these things with Docker is good preparation for Prod. 
+
+Gain knowledge with little risk. 
+
+---
+class: center, middle
+
+General theme:
+
+# Developers have more responsibilities!
+
+..but
+
+# With great responsibility comes great power!
+
+---
+
+Closing thoughts:
+
+Docker is the most useful in:
+
+* heterogenous environments 
+* multiple autonomous teams 
+* many external service denpencies
+* complex systems with many running parts
+
+You get executable documentation for running, building, etc.
+
+???
+
+heterogenous = multiple languages, async upgrade of tech
+
+executable docs: never gets outdated 
+
+
+---
+class: center, middle
+
+# Thank you!
+
+
+    </textarea>
+    <script src="remark-latest.min.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
