@@ -103,6 +103,80 @@
   <body>
     <textarea id="source">
 
+TOC
+* Intro
+  * About me: history, company, and "I haven't used docker in production" disclaimer
+  * Misconceptions
+
+* Single greatest docker advantage: reproducibility
+
+* Everything else revolves around reproducibility:
+  * Isolation
+  * Automation
+  * Self-documenting
+  * Universal (build, local dev, prod)
+
+* Where is it useful? What's before production?
+  * CD Pipeline
+
+* Local work
+  * Trying out stuff (new version of a db, web server, caches, etc. or even the docker registry!)
+  * Running services (e.g Git repo, local gitea instance) 
+
+* Development environment (running dependencies, building, running own project)
+  * the dreaded "How to configure your environment" page (rude goldberg machine)
+  * The pain of working on multiple projects: 1 million servers started, multiple Node versions, Python 2.7/3.5/3.6, etc.)
+  * Having JAVA when working on the frontend and having Node when working on the backend
+  * What does docker offer?
+    * Automation & Isolation: Easy to configure env, easy switch between multiple versions of the same app (that maybe have completely different dependencies)
+    * Documentation (in executable form)
+    * Isolation gives you Autonomy (from other devs that need to build & run your code) **VERY IMPORTANT**
+
+* Builds
+  * Create one or more build containers
+  * As granular as possible: e.g a container with java, a container with node, etc.
+  * Staged builds? Yay or nay?
+
+* Running integration tests
+  * e.g psql instance, several databases, all in containers
+  * Gotchas
+    * Maven/Gradle have Docker plugins!
+    * Don't use them, just go with bash
+
+* Running end-to-end tests
+  * Selenium servers (no need to configure stuff)
+  * One selenium container for each browser
+  * Allows you to parallelize later on
+
+* Continuos Integration
+  * Why configure each environment? Just use the same docker build containers, db containers, selenium containers, etc.!
+  * Isolation gives you Autonomy (from the ops) **VERY IMPORTANT**
+
+* Deployments
+  * Isolation & Portability gives you Autonomy from ops, faster evolution
+  * Might be separate (e.g compose locally, kubernetes everywhere else)
+     * ..but ideally same thing (see minikube)
+
+* Note on deployments: ideally you should be using the same "scripts" everywhere (dev/demo/stage/prod) Switching to Docker on everything except prod will most likely cause things to break
+  * ..but if already broken.. ¯\_(ツ)_/¯
+
+
+* Summary
+  * Reproducible
+  * Perfect isolation
+  * Portable
+  * Executable documentation
+* Gotchas
+  * Not enough minerals
+  * Windows
+  * Cleanup
+  * Docker in docker?
+  * Repo cache folder
+* Thanks
+
+
+---
+
 class: center, middle
 
 We can't use Docker in production!
