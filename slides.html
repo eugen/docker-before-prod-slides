@@ -101,20 +101,19 @@
     </style>
   </head>
   <body>
-    <textarea id="source">
-
+<!--
 TOC
 * Intro
   * About me: history, company, and "I haven't used docker in production" disclaimer
   * Misconceptions
 
-* Single greatest docker advantage: reproducibility
+* Docker advantages in a single word: reproducibility
 
 * Everything else revolves around reproducibility:
   * Isolation
+  * Portability
   * Automation
   * Self-documenting
-  * Universal (build, local dev, prod)
 
 * Where is it useful? What's before production?
   * CD Pipeline
@@ -129,6 +128,7 @@ TOC
   * Having JAVA when working on the frontend and having Node when working on the backend
   * What does docker offer?
     * Automation & Isolation: Easy to configure env, easy switch between multiple versions of the same app (that maybe have completely different dependencies)
+    * Allows you to focus
     * Documentation (in executable form)
     * Isolation gives you Autonomy (from other devs that need to build & run your code) **VERY IMPORTANT**
 
@@ -172,21 +172,34 @@ TOC
   * Cleanup
   * Docker in docker?
   * Repo cache folder
+  * The Hub search is broken
 * Thanks
 
+-->
+    <textarea id="source">
+# Intro
+
+### who: Eugen Anghel
+### what: I build stuff with code, mostly backend
+### where: Software Architect at Endava
 
 ---
-
 class: center, middle
 
-We can't use Docker in production!
+# We can't use Docker <br>in production!
+
+???
+
+Everybody starts with this, but as we'll see, you don't have to! (not at first)
 
 ---
-Common misconceptions:
+## Common misconceptions:
+
 * Docker is all-or-nothing 
 * Docker complicates things
 * Docker doesn't work on Windows
 * Docker is only useful in Production
+* Docker is for Ops
 
 ???
 
@@ -195,52 +208,159 @@ Not saying that Docker is not complicated, it's just simpler and more sane than 
 Docker works on windows just as good as Git. It has its quirks and I'd rather be using Linux, but the issues that exist are minor.
 
 ---
-Regular CD pipeline:
+class: center, middle
 
-Dev ➜ CI ➜ QA ➜ Demo ➜ <span color=red>Prod</span>
+## Greatest docker advantage
+# Reproducibility
 
 ---
+### Everything else revolves around reproducibility:
 
-Before production:
-- running the system (dev machine, qa envs, etc.)
+* Isolation
+* Portability
+* Automation
+* Self-documenting
+
+---
+## So what's before production? 
+
+### Dev ➜ CI ➜ QA ➜ Demo ➜ <s style="color: red">Prod</s>
+
+---
+## So what's before production? 
+- development tools 
+- research (dev)
 - building the code & unit tests (dev machine, CI server)
 - deploying/configuring a full system (dev, qa, demo)
+- running the system (dev, qa envs, etc.)
 - integration testing (dev, qa)
 - end-to-end testing (dev, qa)
 - performance testing (dev, qa, demo)
 
 ???
 
+research = evaluating some tech
+
 So first thing to notice is that everything needs to be done by the developers on their own environment! People are usually (negatively) suprprised by this, but only because it's been hard to do in the past. Remember branches before git, in svn?
 
 ---
-.chapter[Running]
-What we have right now? 
+## Research 
 
-Does our service require any dependencies? Db? Cache? Auth Server? Service registry?
+Evaluating new version of a db, web server, caches, etc.
 
-The infamous "how to setup your environment" wiki page
-* often poorly written
-* often outdated
-* always incomplete
+### `docker run` and chill
 
-Vagrant does solve many of these issues.
+```
+docker run -p 6379 redis:alpine
+docker run -p 11211:11211 memcached
+docker run -p 8432 \
+    -e POSTGRES_DB=myapp \
+    -e POSTGRES_PASSWORD=31337 \
+    -e POSTGRES_USER=myuser \
+    postgres:9.6-alpine
+```
 
 ---
-.chapter[Running]
+## Development Tools
 
-Run your dependencies with Docker!
-* composable: you can reuse containers between services
-* very fast start times compared to a VM
-* never gets outdated
+### Gitea:
+`docker run gitea/gitea`
 
-`docker-compose up` and done
+### Jenkins:
+
+`docker run -p 8080 jenkins/jenkins:2.76-alpine`
+
+???
+Most of the images create persistent volumes automatically, a blessing and a curse
+
+---
+## Development Environment
+
+#### Joining a project is not all fun
+
+* 2 Node versions
+* 2 JDK versions
+* Python 2.7/3.5/3.6
+* 3 databases, 1 cache, 1 auth server, and other 3-5 dependencies to install
+* 17 config files to change
+
+#### The dreaded "How to configure your environment" page
+
+<img src="instructions-unclear.jpg">
 
 ???
 
-composable: very useful if working on multiple services
+"multiple projects" can mean multiple (micro)services
 
-not wasting ram by having multiple vms
+Vagrant can solve many of these issues at the price of VMs
+
+how to configure env page: rarely updated and never complete
+
+---
+## Development Environment
+
+#### Did you ever:
+* work as a backend dev, but had to install Node?
+* work as a frontend dev but had to install Java?
+* not be allowed to upgrade X because 7 other teams use an old X?
+
+???
+
+Some people have scripts, but it's impossible to build something that works across all envs.
+
+---
+## Development Environment: Dependencies
+
+### `docker-compose up` and chill
+```
+version: '3'
+services:
+  mysql:
+    image:  mysql:5.7
+    ports:
+      -  3306:3306
+    environment:
+      -  MYSQL_ROOT_PASSWORD=dbpass
+      -  MYSQL_DATABASE=dev
+  mongo:
+    image:  mongo:3.0
+    ports:
+      -  27017:27017
+  redis:
+    image:  redis:4-alpine
+    ports:
+      -  6379:6379
+```
+
+---
+## Development Environment: Building
+
+#### Create a build container for each tech stack:
+  * jdk8
+  * jdk7
+  * node7
+  * etc
+
+#### Build 
+
+
+
+---
+## Development Environmet
+
+* Automation & Isolation: Easy to configure env, easy to join project, easily switch between multiple versions of the same app (that maybe have completely different dependencies)
+* Self-Documentating
+* Isolation gives you Autonomy 
+* Versioned
+
+???
+
+Documentation: compose file is executing documentation; never gets outdated
+Autonomy from other devs that need to build & run your code, VERY IMPORTANT
+Easy to join project
+Versioned: per branch, easy experimenting; wiki pages are not per branch
+
+On the downside, you can no longer use the classical excuse: "Yesterday I configured my environment"
 
 ---
 .chapter[Building]
