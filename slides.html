@@ -101,87 +101,13 @@
     </style>
   </head>
   <body>
-<!--
-TOC
-* Intro
-  * About me: history, company, and "I haven't used docker in production" disclaimer
-  * Misconceptions
-
-* Docker advantages in a single word: reproducibility
-
-* Everything else revolves around reproducibility:
-  * Isolation
-  * Portability
-  * Automation
-  * Self-documenting
-
-* Where is it useful? What's before production?
-  * CD Pipeline
-
-* Local work
-  * Trying out stuff (new version of a db, web server, caches, etc. or even the docker registry!)
-  * Running services (e.g Git repo, local gitea instance) 
-
-* Development environment (running dependencies, building, running own project)
-  * the dreaded "How to configure your environment" page (rude goldberg machine)
-  * The pain of working on multiple projects: 1 million servers started, multiple Node versions, Python 2.7/3.5/3.6, etc.)
-  * Having JAVA when working on the frontend and having Node when working on the backend
-  * What does docker offer?
-    * Automation & Isolation: Easy to configure env, easy switch between multiple versions of the same app (that maybe have completely different dependencies)
-    * Allows you to focus
-    * Documentation (in executable form)
-    * Isolation gives you Autonomy (from other devs that need to build & run your code) **VERY IMPORTANT**
-
-* Builds
-  * Create one or more build containers
-  * As granular as possible: e.g a container with java, a container with node, etc.
-  * Staged builds? Yay or nay?
-
-* Running integration tests
-  * e.g psql instance, several databases, all in containers
-  * Gotchas
-    * Maven/Gradle have Docker plugins!
-    * Don't use them, just go with bash
-
-* Running end-to-end tests
-  * Selenium servers (no need to configure stuff)
-  * One selenium container for each browser
-  * Allows you to parallelize later on
-
-* Continuos Integration
-  * Why configure each environment? Just use the same docker build containers, db containers, selenium containers, etc.!
-  * Isolation gives you Autonomy (from the ops) **VERY IMPORTANT**
-
-* Deployments
-  * Isolation & Portability gives you Autonomy from ops, faster evolution
-  * Might be separate (e.g compose locally, kubernetes everywhere else)
-     * ..but ideally same thing (see minikube)
-
-* Note on deployments: ideally you should be using the same "scripts" everywhere (dev/demo/stage/prod) Switching to Docker on everything except prod will most likely cause things to break
-  * ..but if already broken.. ¯\_(ツ)_/¯
-
-
-* Summary
-  * Reproducible
-  * Perfect isolation
-  * Portable
-  * Executable documentation
-* Gotchas
-  * Not enough minerals
-  * Windows
-  * Cleanup
-  * Docker in docker?
-  * Repo cache folder
-  * The Hub search is broken
-* Thanks
-
--->
     <textarea id="source">
+
 # Intro
 
 ### who: Eugen Anghel
 ### what: I build stuff with code, mostly backend
-### where: Software Architect at Endava
+### where: software architect at Endava
 
 ---
 class: center, middle
@@ -210,7 +136,7 @@ Docker works on windows just as good as Git. It has its quirks and I'd rather be
 ---
 class: center, middle
 
-## Greatest docker advantage
+## Greatest docker advantage:
 # Reproducibility
 
 ---
@@ -241,37 +167,54 @@ class: center, middle
 
 research = evaluating some tech
 
+That's a lot
+
 So first thing to notice is that everything needs to be done by the developers on their own environment! People are usually (negatively) suprprised by this, but only because it's been hard to do in the past. Remember branches before git, in svn?
 
 ---
 ## Research 
 
-Evaluating new version of a db, web server, caches, etc.
+### Evaluating dbs, web server, caches, etc: <br>`docker run` and chill
 
-### `docker run` and chill
-
+#### Redis: 
+`docker run -p 6379 redis:alpine`
+#### memcached:
+`docker run -p 11211:11211 memcached`
+#### Postgres
 ```
-docker run -p 6379 redis:alpine
-docker run -p 11211:11211 memcached
 docker run -p 8432 \
     -e POSTGRES_DB=myapp \
     -e POSTGRES_PASSWORD=31337 \
     -e POSTGRES_USER=myuser \
     postgres:9.6-alpine
 ```
-
 ---
 ## Development Tools
 
-### Gitea:
+#### Gitea:
 `docker run gitea/gitea`
 
-### Jenkins:
+#### Jenkins:
 
 `docker run -p 8080 jenkins/jenkins:2.76-alpine`
 
+#### Nginx
+
+`docker run -v /host/path/nginx.conf:/etc/nginx/nginx.conf nginx`
+
 ???
 Most of the images create persistent volumes automatically, a blessing and a curse
+
+---
+class: center, middle
+
+TODO TODO TODO 
+TODO TODO TODO 
+# Demo Time!
+TODO TODO TODO 
+TODO TODO TODO 
+
+TODO: research if you can embed a console in the page
 
 ---
 ## Development Environment
@@ -292,6 +235,8 @@ Most of the images create persistent volumes automatically, a blessing and a cur
 
 "multiple projects" can mean multiple (micro)services
 
+Some people have scripts, but it's impossible to build something that works across all envs.
+
 Vagrant can solve many of these issues at the price of VMs
 
 how to configure env page: rarely updated and never complete
@@ -299,14 +244,11 @@ how to configure env page: rarely updated and never complete
 ---
 ## Development Environment
 
-#### Did you ever:
-* work as a backend dev, but had to install Node?
-* work as a frontend dev but had to install Java?
-* not be allowed to upgrade X because 7 other teams use an old X?
+#### Have you ever:
+* worked as a backend dev, but had to install Node?
+* worked as a frontend dev but had to install Java?
 
-???
-
-Some people have scripts, but it's impossible to build something that works across all envs.
+#### Upgrade one tool -> put your colleagues to work
 
 ---
 ## Development Environment: Dependencies
@@ -331,200 +273,186 @@ services:
     ports:
       -  6379:6379
 ```
+---
+class: center, middle
+
+TODO TODO TODO 
+TODO TODO TODO 
+# Demo Time!
+TODO TODO TODO 
+TODO TODO TODO 
 
 ---
 ## Development Environment: Building
 
-#### Create a build container for each tech stack:
+#### Create a build image for each tech stack:
   * jdk8
   * jdk7
   * node7
-  * etc
 
-#### Build 
+#### Build with `docker-compose -f build-compose.yml up`
 
+```
+TODO TODO TODO 
+TODO TODO TODO 
+TODO example build compose file
+TODO TODO TODO 
+TODO TODO TODO 
+```
+---
+## Development Environment: Building
 
+#### Gotchas:
+* mount repo cache directories as volumes
+* docker in docker: just share the socket as a volume
+
+#### Docker multi-stage builds
 
 ---
-## Development Environmet
+class: center, middle
 
-* Automation & Isolation: Easy to configure env, easy to join project, easily switch between multiple versions of the same app (that maybe have completely different dependencies)
-* Self-Documentating
-* Isolation gives you Autonomy 
-* Versioned
+TODO TODO TODO 
+TODO TODO TODO 
+# Demo Time!
+TODO TODO TODO 
+TODO TODO TODO 
+
+---
+## Development Environment: Docker Benefits
+
+* Easier to join a project
+* Easier to switch between multiple versions
+* Autonomy: free upgrades to tooling
+* Focus on own tech stack
+* Self-Documenting
+* Versioning
 
 ???
 
 Documentation: compose file is executing documentation; never gets outdated
-Autonomy from other devs that need to build & run your code, VERY IMPORTANT
-Easy to join project
+Autonomy from other devs that need to build & run your code, VERY IMPORTANT, everyone focuses on their own tech stack
 Versioned: per branch, easy experimenting; wiki pages are not per branch
 
 On the downside, you can no longer use the classical excuse: "Yesterday I configured my environment"
 
 ---
-.chapter[Building]
-
-What's wrong with how we do things?
-
-CI server has everything and the kitchen sink:
-- JDK 7
-- JDK 8
-- 3 versions of Node
-- Python (3 or 2?)
-
-Each update means Ops headaches.
-
-Each update can mean a whole different build breaks.
-
-
-.footnote[Cleanup? What's that?]
-
-???
-
-everything but the kitchen sink =  to cover the 20+ projects on the CI server
-
-no isolation = impossible to test if an update will break things
-
----
-.chapter[Building]
-
-Do the build inside a Docker container!
-- Devs maintain Docker image for doing the build
-- Builds completely isolated
-- Upgrades to newer Java, Node, .NET Core are completely transparent
-- You don't even need to save the artifacts, they get pushed to Nexus/Docker Registry/etc.
-
-???
-
-having something describe what's needed for the build (i.e the build dockerfile) also acts as documentation that's guaranteed to work and not get outdated.
-
----
-.chapter[Building]
-Gotchas: 
-- make sure you use volumes for package caches (.node_modules, .m2, .etc)
-- ???
-
-???
-
-share package cache = no need to download the internet again with each build
-
----
-.chapter[Deployment]
-What's wrong with how we do things?
-
-- dev machine: manual ad-hoc configuration, vagrant (Devs)
-- qa envs: ad-hoc scripts, config management tool (e.g Puppet) (Ops)
- - usually different from Prod anyway
- - manually configured on each machine/env
-
-???
-
-prod: Different scripts because prod is different, right? Well it doesn't have to be! Well it may probably still be different, but not by as much as it is now.
-
----
 class: center, middle
 
-.chapter[Deployment]
+# You also get more responsibilities<sup>*</sup>
 
+.footnote[<sup>*</sup>with great responsibility comes great power]
 
-changes are done by hand, often late,
-<br>
-by people other than the implementors
-
-↓
-
-mistakes are made, timelines are broken
-
-↓
-
-people stop wanting to change stuff
-
-
----
-.chapter[Deployment]
-
-Deploy with Docker!
-* Package your apps as images ➜ ensure they work the same everywhere
-* Isolation in docker is free ➜ number of servers doesn't matter 
-* Dev maintains the docker-compose.yml file ➜ required Ops interventions is minimized
-
-
-Dependencies
-* also run as containers just like in Dev (e.g as part of the same docker-compose project)
-
-Tips:
-* Package even web apps static files, e.g extending the nginx image
-* The same images can be used by Devs
-* The **whole** system must run with Docker!
-
-
----
-.chapter[Automatic Testing]
-
-- integration testing: requires other services to be up
-- end-to-end testing: requires selenium hub/slave
-- performance testing requires
- - (maybe) dedicated instance of the service 
- - (maybe) several workers that will hit the service
-
----
-.chapter[Automatic Testing]
-
-Run all of the above as containers!<sup>*</sup>
-- short-lived containers that are only live during the build
-
-Gotchas:
-- make sure the containers actually stop after the build!
- - Jenkinsfile try finally, bash exit traps, etc.
- - periodic sanity cleanup scripts
-- use namespaces (e.g compose project names) to prevent conflicts
-- make sure you have enough resources
-
-
-.footnote[<sup>*</sup> no surprise by now]
----
-
-Doing all these things with Docker is good preparation for Prod. 
-
-Gain knowledge with little risk. 
-
----
-class: center, middle
-
-General theme:
-
-# Developers have more responsibilities!
-
-..but
-
-# With great responsibility comes great power!
-
----
-
-Closing thoughts:
-
-Docker is the most useful in:
-
-* heterogenous environments 
-* multiple autonomous teams 
-* many external service denpencies
-* complex systems with many running parts
-
-You get executable documentation for running, building, etc.
 
 ???
 
-heterogenous = multiple languages, async upgrade of tech
-
-executable docs: never gets outdated 
-
+responsibilities: maitaining the build images, dependency compose files
 
 ---
-class: center, middle
+## Integration Testing
 
-# Thank you!
+#### Postgres, MySQL, Redis
+* start the container
+* run tests
+* stop & delete the container
 
+#### Gotchas
+* Maven/Gradle have Docker plugins
+* Bash + Docker CLI is usually easier<sup>*</sup>
+* Random ports & environment variables are your friend
+
+.footnote[<sup>*</sup>if you're willing to learn bash]
+
+---
+## End-To-End Testing
+
+#### Just like integration tests:
+* Start Selenium server container
+* Run tests
+* Stop & delete containers
+
+#### Gotchas
+* Networking issues can pop up; simpler to either
+  * deploy the app itself as container(s)
+  * use the host network
+
+???
+
+Perhaps one selenium container for each browser
+
+Networking issues: the cotnainer need to be able to access the host if the app is running on the host. 
+
+---
+
+TODO TODO TODO 
+TODO TODO TODO 
+# Demo Time!
+TODO TODO TODO 
+TODO TODO TODO 
+
+---
+## Continous Integration
+
+#### Dev environment woes, take 2:
+* 2 Node versions
+* 2 JDK versions
+* etc. etc. etc × number_of_projects 
+* Devs need to bargain with Ops
+* Upgrading project X breaks Y
+
+#### Build in containers
+* Use the same build images metioned previously
+* ...extra incentive to create them
+
+#### Isolation gives you Autonomy (from the other teams *and* from Ops)
+
+---
+## Deployments
+
+#### Using Docker for deployments:
+* Same advantages as above: Isolation, Autonomy, Portability, Reproducibility
+* Allows Ops to focus on Ops things
+
+#### Gotchas
+* Ideally you should be using the same deployment method everywhere (dev/demo/stage/prod) 
+* Switching to Docker on everything except prod will most likely cause things to break
+* ..but if already broken.. `¯\_(ツ)_/¯`
+
+---
+class: center middle
+TODO TODO TODO 
+TODO TODO TODO 
+# Minikube Demo Time!
+TODO TODO TODO 
+TODO TODO TODO 
+
+---
+# Summary
+
+#### Benefits
+* Reproducible
+* Isolation
+* Portable
+* Executable documentation
+
+
+#### Most useful in 
+* Heterogenous environments 
+* Multiple autonomous teams 
+* Many external service denpencies
+* Complex systems with many running parts
+
+
+#### Gotchas
+* Not enough minerals
+* Windows
+* Cleanup
+* Docker in docker?
+* Repo cache folder
+* The Hub search is broken
+
+---
+class: center middle
+# Thanks / Merci / Danke!
 
     </textarea>
     <script src="remark-latest.min.js"></script>
