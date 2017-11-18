@@ -224,8 +224,14 @@ TODO: research if you can embed a console in the page
 * 2 Node versions
 * 2 JDK versions
 * Python 2.7/3.5/3.6
-* 3 databases, 1 cache, 1 auth server, and other 3-5 dependencies to install
+* 3 databases
+* 1 cache server
+* 1 auth server
 * 17 config files to change
+
+
+---
+## Development Environment
 
 #### The dreaded "How to configure your environment" page
 
@@ -306,7 +312,7 @@ TODO TODO TODO
 * mount repo cache directories as volumes
 * docker in docker: just share the socket as a volume
 
-#### Docker multi-stage builds
+#### Docker multi-stage builds: jury's still out
 
 ---
 class: center, middle
@@ -358,7 +364,10 @@ responsibilities: maitaining the build images, dependency compose files
 #### Gotchas
 * Maven/Gradle have Docker plugins
 * Bash + Docker CLI is usually easier<sup>*</sup>
-* Random ports & environment variables are your friend
+* Even with Docker, isolation can be tricky:
+  * Random ports are your friend
+  * Separate networks for each build
+* Make sure you cleanup
 
 .footnote[<sup>*</sup>if you're willing to learn bash]
 
@@ -366,9 +375,9 @@ responsibilities: maitaining the build images, dependency compose files
 ## End-To-End Testing
 
 #### Just like integration tests:
-* Start Selenium server container
-* Run tests
-* Stop & delete containers
+* Start a Selenium server container
+* Run the tests
+* Delete the container
 
 #### Gotchas
 * Networking issues can pop up; simpler to either
@@ -397,9 +406,9 @@ TODO TODO TODO
 * 2 JDK versions
 * etc. etc. etc × number_of_projects 
 * Devs need to bargain with Ops
-* Upgrading project X breaks Y
+* Upgrading project X breaks project Y
 
-#### Build in containers
+#### Solution: Build in containers
 * Use the same build images metioned previously
 * ...extra incentive to create them
 
@@ -438,7 +447,7 @@ TODO TODO TODO
 #### Most useful in 
 * Heterogenous environments 
 * Multiple autonomous teams 
-* Many external service denpencies
+* Many external service dependencies
 * Complex systems with many running parts
 
 
@@ -452,7 +461,8 @@ TODO TODO TODO
 
 ---
 class: center middle
-# Thanks / Merci / Danke!
+# Mulțumesc!
+### Thanks / Merci / Danke
 
     </textarea>
     <script src="remark-latest.min.js"></script>
