@@ -139,13 +139,17 @@ class: center, middle
 ## Greatest docker advantage:
 # Reproducibility
 
----
-### Everything else revolves around reproducibility:
+???
 
-* Isolation
-* Portability
-* Automation
-* Self-documenting
+Reproducibility: reproduce results obtained on one computer (yours?) on other computers: your colleague's, the dev server, or even prod
+
+---
+## Everything else revolves around reproducibility:
+
+### * Isolation
+### * Portability
+### * Automation
+### * Self-documenting
 
 ---
 ## So what's before production? 
@@ -306,7 +310,9 @@ You can also run clients with containers, no need to locally install the depende
 ### Redis
 `docker run --rm -it --network demo_default redis:4-alpine redis-cli -h demo_redis_1`
 
-### Available for most dependencies
+???
+
+Clients: Available for most dependencies
 
 ---
 class: center, middle
@@ -314,6 +320,8 @@ class: center, middle
 # Demo Time!
 
 ???
+
+docker-compose -f devel-en-compose.yml -p demo up
 
 docker run --rm -it --network demo_default mongo:3.0 mongo --host demo_mongo_1
 
@@ -352,19 +360,27 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 ``` 
 
----
-## Development Environment: Building
-
 ```
-class: center, middle
+FROM java:8-jdk-alpine
+USER root
+COPY run.sh /
+RUN apk update && apk add --no-cache libstdc++ bash docker
+ENTRYPOINT /bin/bash /run.sh
+```
+
+---
+class: center middle
 
 # Demo Time!
 
-```
 ???
+
 docker-compose -f build-compose.yml -p demo up --build
+
 docker image ls
+
 docker run -p8080:8080 --name demo-java-app demo-java-app
+
 
 ---
 ## Development Environment: Docker Benefits
