@@ -3,7 +3,19 @@
   <head>
     <title>Docker before production</title>
     <meta charset="utf-8">
-    <style>
+     <style type="text/css">
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+    </style>
+    <stylenope style='display: none'>
       @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
       @import url(https://fonts.googleapis.com/css?family=Ubuntu:400,700,400italic);
@@ -98,7 +110,7 @@
       /* reduce spacing for lists folowing a paragraph */
       margin-top: -0.8em;
       }
-    </style>
+    </stylenope>
   </head>
   <body>
     <textarea id="source">
@@ -146,10 +158,10 @@ Reproducibility: reproduce results obtained on one computer (yours?) on other co
 ---
 ## Everything else revolves around reproducibility:
 
-### * Isolation
-### * Portability
-### * Automation
-### * Self-documenting
+### Isolation
+### Portability
+### Automation
+### Self-documenting
 
 ---
 ## So what's before production? 
@@ -178,13 +190,13 @@ So first thing to notice is that everything needs to be done by the developers o
 ---
 ## Research 
 
-### Evaluating dbs, web server, caches, etc: <br>`docker run` and chill
+### Evaluating dbs, web server, caches, etc: docker run and chill
 
 #### Redis: 
 `docker run -p 6379 redis:alpine`
 #### memcached:
 `docker run -p 11211:11211 memcached`
-#### Postgres
+#### Postgres:
 ```
 docker run -p 8432 \
     -e POSTGRES_DB=myapp \
@@ -278,7 +290,7 @@ how to configure env page: rarely updated and never complete
 ---
 ## Development Environment: Dependencies
 
-### `docker-compose up` and chill
+### docker-compose up and chill
 ```
 version: '3'
 services:
@@ -301,7 +313,7 @@ services:
 ---
 ## Development Environment: Dependencies
 
-You can also run clients with containers, no need to locally install the dependencies:
+Also run clients with Docker, no need to install those either:
 
 ### Mongo
 `docker run --rm -it --network demo_default mongo:3.0 mongo --host demo_mongo_1`
@@ -487,15 +499,7 @@ docker-compose -f e2e-compose.yml -p demo up --build selenium-runner; docker-com
 * ..but if already broken.. `¯\_(ツ)_/¯`
 
 ---
-class: center middle
-TODO TODO TODO 
-TODO TODO TODO 
-# Minikube Demo Time!
-TODO TODO TODO 
-TODO TODO TODO 
-
----
-# Summary
+## Summary
 
 #### Benefits
 * Reproducible
@@ -511,12 +515,15 @@ TODO TODO TODO
 * Complex systems with many running parts
 
 
+---
+## Summary
+
 #### Gotchas
 * Not enough minerals
 * Windows
-* Cleanup
-* Docker in docker?
-* Repo cache folder
+* Cleanup (container, images, volumes)
+* Docker in Docker
+* Share caches (e.g library repo caches)
 * The Hub search is broken
 
 ---
