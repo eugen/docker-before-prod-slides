@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  build-java-app:
+    build: 
+      context: ./java-builder
+      dockerfile: Dockerfile
+    image: demo-java-builder
+    volumes: 
+      - ./java-app:/src
+      - ./gradle-home:/root
+      - /var/run/docker.sock:/var/run/docker.sock
+    
