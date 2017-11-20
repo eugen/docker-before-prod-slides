@@ -362,7 +362,7 @@ class: center, middle
 
 ```
 ???
-docker-compose -f build-compose.yml up --build
+docker-compose -f build-compose.yml -p demo up --build
 docker image ls
 docker run -p8080:8080 --name demo-java-app demo-java-app
 
@@ -434,15 +434,13 @@ Perhaps one selenium container for each browser
 Networking issues: the cotnainer need to be able to access the host if the app is running on the host. 
 
 ---
+class: center, middle
 
 # Demo Time!
 
 ???
 
-DEMO DEMO TODO TODO DEMO 
-DEMO DEMO TODO TODO DEMO 
-DEMO DEMO TODO TODO DEMO 
-DEMO DEMO TODO TODO DEMO 
+docker-compose -f e2e-compose.yml -p demo up --build selenium-runner; docker-compose -f e2e-compose.yml -p demo down
 
 ---
 ## Continous Integration

@@ -12,4 +12,5 @@ services:
     volumes:
       - ./webtests:/webtests
       - ./maven-home:/root/.m2
-
+    depends_on:
+      - selenium-chrome
